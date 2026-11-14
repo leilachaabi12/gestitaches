@@ -1,0 +1,13 @@
+# Fichiers produits par la compilation
+target/
+
+# Fichiers propres a IntelliJ IDEA et VS Code
+.idea/
+*.iml
+.vscode/
+
+# La base de donnees se recree a partir de schema.sql : on ne la versionne pas
+*.db
+
+# Secrets : ne jamais versionner de mot de passe ni de cle
+.env
