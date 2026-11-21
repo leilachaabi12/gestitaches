@@ -9,7 +9,7 @@ Point de départ du projet fil rouge du module « Génie logiciel assisté par l
 | `docs/besoin.md` | Expression du besoin recueillie auprès de la cliente |
 | `spec.md` | Spécification à compléter (TP1, Partie B) |
 | `schema.sql` | Schéma de la base, **avec des erreurs volontaires** à corriger (TP1, Partie C) |
-| `instructions-projet.modele.md` | Modèle d'instructions permanentes pour l'assistant IA (TP1, Partie D) |
+| `GEMINI.md` | Modèle d'instructions permanentes pour l'assistant IA (TP1, Partie D) |
 | `pom.xml` | Projet Maven : Java 25, pilote JDBC SQLite |
 | `src/main/java/…/App.java` | Vérifie que le projet compile et que la base est accessible |
 | `src/main/java/…/dao/DatabaseConnection.java` | Ouvre les connexions vers `gestitaches.db` |
