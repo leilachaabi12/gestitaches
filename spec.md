@@ -4,7 +4,7 @@
 
 ## User story 1 — Créer un projet
 
-En tant que <Chef de projet>, je veux <creer un projet> afin de <organiser les taches de mon equipe>.
+En tant que Chef de projet, je veux creer un projet afin de organiser les taches de mon equipe.
 
 Critères d'acceptation :
 
@@ -18,22 +18,22 @@ Critères d'acceptation :
 Cas limite : creation dun projet avec un nom deja existant, la création est refusée avec un message indiquant que ce projet existe deja
 
 ## User story 2 — Créer une tâche dans un projet
-En tant que <chef de projet ou memebre de l equipe>, je veux <creer une taches> afin de <de décomposer le travail à réaliser.>.
+En tant que chef de projet ou memebre de l equipe, je veux creer une taches afin de <de décomposer le travail à réaliser..
 
 Critères d'acceptation :
 
 - Étant donné un projet existant
   Quand j'ajoute une tâche avec le titre « Maquette de la page d'accueil »
   Alors la tâche est rattachée à ce projet, avec le statut « à faire » et sans membre assigné
-- Étant donné un projet qui contient déjà deux tâches
-  Quand j'en ajoute une troisième
-  Alors le projet affiche trois tâches, les deux premières restant inchangées
+- Étant donné un projet qui contient d'autre taches
+  Quand j'en ajoute une tache
+  Alors le projet affiche tous les taches sans changer les anciens
 
-Cas limite1 : <si le titre est vide, la tâche est refusée avec un message d'erreur et le projet reste inchangé.>
-Cas limite2 : <si le statut est different de {à faire, en cours, terminer}, la tâche est refusée avec un message d'erreur et le projet reste inchangé.>
+Cas limite1 : si le titre est vide, la tâche est refusée avec un message d'erreur et le projet reste inchangé.
+Cas limite2 : si le statut est different de {à faire}, la tâche est refusée avec un message d'erreur et le projet reste inchangé.
 
 ## User story 3 — Assigner une tâche à un membre
-En tant que <chef de proojet>, je veux <assigner une tache à un membre de l equipe> afin <que chacun sache ce dont il est responsable.>.
+En tant que chef de proojet, je veux assigner une tache à un membre de l equipe afin que chacun sache ce dont il est responsable.
 
 Critères d'acceptation :
 
@@ -44,25 +44,28 @@ Critères d'acceptation :
   Quand je l'assigne à un second membre
   Alors le second membre remplace le premier comme responsable
 
-Cas limite : <si le membre n'existe pas, l'assignation est refusée avec un message d'erreur et la tâche conserve son responsable actuel (ou reste sans responsable)>
+Cas limite : si le membre n'existe pas, l'assignation est refusée avec un message d'erreur et la tâche conserve son responsable actuel (ou reste sans responsable)
 
 ## User story 4 — Changer le statut d'une tâche
-En tant que <membre de l equipe>, je veux <hanger le statut d'une taches> afin de <suivre l'avancement du travail>.
+En tant que membre de l equipe, je veux hanger le statut d'une taches afin de suivre l'avancement du travail.
 
 Critères d'acceptation :
 
 - Étant donné une tâche au statut « à faire »
   Quand je la passe à « en cours »
   Alors son statut devient « en cours »
-- Étant donné une tâche au statut « en cours »
+- Étant donné une tâche au statut « en cours » ou « à faire »
   Quand je la passe à « terminé »
   Alors son statut devient « terminé »
+- Étant donné une tâche au statut « terminé » 
+  Quand je la consulte 
+  Alors son statut est figé
 
 
-Cas limite : <si le statut demandé n'est pas l'une des trois valeurs autorisées (« à faire », « en cours », « terminé »), le changement est refusé et le statut de la tâche reste inchangé.
+Cas limite : si le statut demandé n'est pas l'une des trois valeurs autorisées (« à faire », « en cours », « terminé »), le changement est refusé et le statut de la tâche reste inchangé.
 
 ## User story 5 — Filtrer les tâches par statut ou par membre
-En tant que <chef de projet>, je veux <filtrer les taches par statut ou par personne assignée > afin de <retrouver rapidement les données qui m'intéressent>.
+En tant que chef de projet, je veux filtrer les taches par statut ou par personne assignée  afin de retrouver rapidement les données qui m'intéressent.
 
 Critères d'acceptation :
 
@@ -73,12 +76,13 @@ Critères d'acceptation :
   Quand je filtre sur un membre
   Alors seules les tâches assignées à ce membre sont affichées
 
-Cas limite : <si aucune tâche ne correspond au filtre, la liste est vide et un message l'indique, sans erreur.>
+Cas limite : 
 
 ## Contraintes techniques
 
-- Langage :
+- Langage : java25
 - Interface graphique :
 - Persistance :
 - Build :
 - Conventions de nommage :
+  Java 25, Swing, SQLite via JDBC, Maven

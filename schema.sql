@@ -5,7 +5,7 @@
 CREATE TABLE utilisateur (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   nom TEXT NOT NULL,
-  email TEXT NOT NULL
+  email TEXT NOT NULL unique
 );
 
 CREATE TABLE projet (
@@ -14,11 +14,14 @@ CREATE TABLE projet (
   description TEXT
 );
 
-CREATE TABLE tache (
+REATE TABLE tache (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   titre TEXT NOT NULL,
   description TEXT,
-  statut TEXT NOT NULL,
-  echeance TEXT NOT NULL,
-  utilisateur_id INTEGER NOT NULL REFERENCES utilisateur(id)
+  statut TEXT NOT NULL DEFAULT 'à faire'
+        CHECK (etat IN ('à faire', 'en cours', 'terminé') ,
+  echeance DATE NOT NULL,
+  date_limite DATE,
+  utilisateur_id INTEGER  REFERENCES utilisateur(id)
+  projet_id INTEGER NOT NULL REFERENCES projet (id)
 );
