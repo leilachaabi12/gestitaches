@@ -14,14 +14,14 @@ CREATE TABLE projet (
   description TEXT
 );
 
-REATE TABLE tache (
+CREATE TABLE tache (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   titre TEXT NOT NULL,
   description TEXT,
   statut TEXT NOT NULL DEFAULT 'à faire'
-        CHECK (etat IN ('à faire', 'en cours', 'terminé') ,
+        CHECK (statut IN ('à faire', 'en cours', 'terminé')) ,
   echeance DATE NOT NULL,
   date_limite DATE,
-  utilisateur_id INTEGER  REFERENCES utilisateur(id)
-  projet_id INTEGER NOT NULL REFERENCES projet (id)
+  utilisateur_id INTEGER REFERENCES utilisateur(id),
+  projet_id INTEGER NOT NULL REFERENCES projet(id)
 );
