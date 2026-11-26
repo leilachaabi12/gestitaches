@@ -1,7 +1,3 @@
--- GestiTaches - schema de la base de donnees
--- ATTENTION : ce schema contient des erreurs volontaires.
--- Votre travail (TP1, Partie C) : les retrouver et les corriger.
-
 CREATE TABLE utilisateur (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   nom TEXT NOT NULL,
