@@ -16,7 +16,7 @@ CREATE TABLE tache (
   description TEXT,
   statut TEXT NOT NULL DEFAULT 'à faire'
         CHECK (statut IN ('à faire', 'en cours', 'terminé')) ,
-  echeance DATE NOT NULL,
+  echeance DATE ,
   date_limite DATE,
   utilisateur_id INTEGER REFERENCES utilisateur(id),
   projet_id INTEGER NOT NULL REFERENCES projet(id)
