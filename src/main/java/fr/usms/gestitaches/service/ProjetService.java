@@ -15,19 +15,22 @@ public class ProjetService {
     }
 
     public Projet creerProjet(String nom) {
+        return creerProjet(nom, null);
+    }
+
+    public Projet creerProjet(String nom, String description) {
         if (nom == null || nom.trim().isEmpty()) {
             throw new IllegalArgumentException("Le nom du projet est obligatoire.");
         }
         String nomNormalise = nom.trim();
+        String descriptionNormalisee = description == null || description.trim().isEmpty()
+                ? null
+                : description.trim();
         if (projetDAO.existeParNom(nomNormalise)) {
             throw new IllegalArgumentException("Ce projet existe deja.");
         }
 
-        try {
-            return projetDAO.creer(nomNormalise);
-        } catch (PersistanceException e) {
-            throw e;
-        }
+        return projetDAO.creer(nomNormalise, descriptionNormalisee);
     }
 
     public List<Projet> listerProjets() {

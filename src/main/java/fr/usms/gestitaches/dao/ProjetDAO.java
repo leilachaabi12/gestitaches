@@ -48,17 +48,22 @@ public class ProjetDAO {
     }
 
     public Projet creer(String nom) {
-        String sql = "INSERT INTO projet (nom, description) VALUES (?, NULL)";
+        return creer(nom, null);
+    }
+
+    public Projet creer(String nom, String description) {
+        String sql = "INSERT INTO projet (nom, description) VALUES (?, ?)";
 
         try (Connection connexion = DatabaseConnection.getConnection();
              PreparedStatement instruction =
                      connexion.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             instruction.setString(1, nom);
+            instruction.setString(2, description);
             instruction.executeUpdate();
 
             try (ResultSet clefs = instruction.getGeneratedKeys()) {
                 if (clefs.next()) {
-                    return new Projet(clefs.getInt(1), nom, null);
+                    return new Projet(clefs.getInt(1), nom, description);
                 }
             }
             throw new PersistanceException("Le projet a ete cree sans identifiant.");

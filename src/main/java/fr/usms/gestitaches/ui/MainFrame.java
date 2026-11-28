@@ -19,6 +19,7 @@ import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
+import java.awt.GridLayout;
 
 public class MainFrame extends JFrame {
 
@@ -26,6 +27,7 @@ public class MainFrame extends JFrame {
     private final DefaultListModel<Projet> projetsModel = new DefaultListModel<>();
     private final JList<Projet> listeProjets = new JList<>(projetsModel);
     private final JTextField champNom = new JTextField(20);
+    private final JTextField champDescription = new JTextField(20);
     private final JLabel ficheProjet = new JLabel("Selectionnez un projet.");
 
     public MainFrame() {
@@ -40,11 +42,17 @@ public class MainFrame extends JFrame {
     }
 
     private void construireInterface() {
-        JPanel formulaire = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JPanel formulaire = new JPanel(new GridLayout(2, 1));
+        JPanel ligneNom = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JPanel ligneDescription = new JPanel(new FlowLayout(FlowLayout.LEFT));
         JButton creer = new JButton("Creer");
-        formulaire.add(new JLabel("Nom du projet :"));
-        formulaire.add(champNom);
-        formulaire.add(creer);
+        ligneNom.add(new JLabel("Nom du projet :"));
+        ligneNom.add(champNom);
+        ligneNom.add(creer);
+        ligneDescription.add(new JLabel("Description (facultative) :"));
+        ligneDescription.add(champDescription);
+        formulaire.add(ligneNom);
+        formulaire.add(ligneDescription);
 
         listeProjets.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         JScrollPane listeDefilante = new JScrollPane(listeProjets);
@@ -65,8 +73,9 @@ public class MainFrame extends JFrame {
 
     private void creerProjet() {
         try {
-            projetService.creerProjet(champNom.getText());
+            projetService.creerProjet(champNom.getText(), champDescription.getText());
             champNom.setText("");
+            champDescription.setText("");
             rafraichirListe();
         } catch (IllegalArgumentException e) {
             JOptionPane.showMessageDialog(this, e.getMessage(), "Creation refusee",
@@ -98,7 +107,11 @@ public class MainFrame extends JFrame {
         try {
             Projet projet = projetService.consulterProjet(projetSelectionne.getId());
             if (projet != null) {
-                ficheProjet.setText("Projet : " + projet.getNom());
+                String description = projet.getDescription() == null
+                        ? "Aucune description"
+                        : projet.getDescription();
+                ficheProjet.setText("Projet : " + projet.getNom() + " — Description : "
+                        + description);
             }
         } catch (PersistanceException e) {
             JOptionPane.showMessageDialog(this, e.getMessage(), "Erreur",

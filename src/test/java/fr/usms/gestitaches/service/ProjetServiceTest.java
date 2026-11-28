@@ -11,6 +11,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class ProjetServiceTest {
@@ -45,7 +46,24 @@ class ProjetServiceTest {
         Projet projet = service.creerProjet("Site web");
 
         assertEquals("Site web", projet.getNom());
+        assertNull(projet.getDescription());
         assertEquals(1, service.listerProjets().size());
+    }
+
+    @Test
+    void creerProjetAvecDescriptionFacultative() {
+        Projet projet = service.creerProjet("Site web", "  Refonte du site vitrine  ");
+
+        assertEquals("Refonte du site vitrine", projet.getDescription());
+        assertEquals("Refonte du site vitrine",
+                service.consulterProjet(projet.getId()).getDescription());
+    }
+
+    @Test
+    void convertirUneDescriptionVideEnNull() {
+        Projet projet = service.creerProjet("Site web", "   ");
+
+        assertNull(projet.getDescription());
     }
 
     @Test

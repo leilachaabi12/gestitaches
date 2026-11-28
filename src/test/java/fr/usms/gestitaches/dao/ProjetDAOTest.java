@@ -12,6 +12,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ProjetDAOTest {
@@ -41,11 +42,19 @@ class ProjetDAOTest {
 
     @Test
     void creerPuisLireUnProjet() {
-        Projet cree = dao.creer("Site web");
+        Projet cree = dao.creer("Site web", "Refonte du site vitrine");
         Projet lu = dao.trouverParId(cree.getId());
 
         assertNotNull(cree.getId());
         assertEquals("Site web", lu.getNom());
+        assertEquals("Refonte du site vitrine", lu.getDescription());
+    }
+
+    @Test
+    void creerProjetSansDescription() {
+        Projet cree = dao.creer("Site web", null);
+
+        assertNull(dao.trouverParId(cree.getId()).getDescription());
     }
 
     @Test
