@@ -2,8 +2,10 @@ package fr.usms.gestitaches.service;
 
 import fr.usms.gestitaches.dao.ProjetDAO;
 import fr.usms.gestitaches.dao.TacheDAO;
+import fr.usms.gestitaches.dao.UtilisateurDAO;
 import fr.usms.gestitaches.model.Projet;
 import fr.usms.gestitaches.model.Tache;
+import fr.usms.gestitaches.model.Utilisateur;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -14,10 +16,17 @@ public class TacheService {
 
     private final TacheDAO tacheDAO;
     private final ProjetDAO projetDAO;
+    private final UtilisateurDAO utilisateurDAO;
 
     public TacheService(TacheDAO tacheDAO, ProjetDAO projetDAO) {
+        this(tacheDAO, projetDAO, new UtilisateurDAO());
+    }
+
+    public TacheService(TacheDAO tacheDAO, ProjetDAO projetDAO,
+                        UtilisateurDAO utilisateurDAO) {
         this.tacheDAO = tacheDAO;
         this.projetDAO = projetDAO;
+        this.utilisateurDAO = utilisateurDAO;
     }
 
     public Tache creerTache(int projetId, String titre, String description, LocalDate echeance) {
@@ -51,5 +60,21 @@ public class TacheService {
             throw new IllegalArgumentException("Le projet sélectionné n'existe pas.");
         }
         return tacheDAO.trouverParProjet(projetId);
+    }
+
+    public List<Utilisateur> listerUtilisateurs() {
+        return utilisateurDAO.trouverTous();
+    }
+
+    public Tache assignerUtilisateur(int tacheId, Integer utilisateurId) {
+        Tache tache = tacheDAO.trouverParId(tacheId);
+        if (tache == null) {
+            throw new IllegalArgumentException("La tâche sélectionnée n'existe pas.");
+        }
+        if (utilisateurId != null && utilisateurDAO.trouverParId(utilisateurId) == null) {
+            throw new IllegalArgumentException("Le membre sélectionné n'existe pas.");
+        }
+        tacheDAO.assignerUtilisateur(tacheId, utilisateurId);
+        return tacheDAO.trouverParId(tacheId);
     }
 }

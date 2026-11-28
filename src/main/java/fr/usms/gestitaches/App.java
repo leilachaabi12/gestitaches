@@ -2,6 +2,7 @@ package fr.usms.gestitaches;
 
 import fr.usms.gestitaches.dao.ProjetDAO;
 import fr.usms.gestitaches.dao.TacheDAO;
+import fr.usms.gestitaches.dao.UtilisateurDAO;
 import fr.usms.gestitaches.service.ProjetService;
 import fr.usms.gestitaches.service.TacheService;
 import fr.usms.gestitaches.ui.MainFrame;
@@ -12,9 +13,10 @@ public class App {
 
     public static void main(String[] args) {
         ProjetDAO projetDAO = new ProjetDAO();
+        UtilisateurDAO utilisateurDAO = new UtilisateurDAO();
         TacheDAO tacheDAO = new TacheDAO();
         ProjetService projetService = new ProjetService(projetDAO);
-        TacheService tacheService = new TacheService(tacheDAO, projetDAO);
+        TacheService tacheService = new TacheService(tacheDAO, projetDAO, utilisateurDAO);
         SwingUtilities.invokeLater(() ->
                 new MainFrame(projetService, tacheService).setVisible(true));
     }

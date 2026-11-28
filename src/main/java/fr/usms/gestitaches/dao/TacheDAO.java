@@ -92,23 +92,65 @@ public class TacheDAO {
             instruction.setInt(1, projetId);
             try (ResultSet resultat = instruction.executeQuery()) {
                 while (resultat.next()) {
-                    int utilisateurIdLu = resultat.getInt("utilisateur_id");
-                    Integer utilisateurId = resultat.wasNull() ? null : utilisateurIdLu;
-                    taches.add(new Tache(
-                            resultat.getInt("id"),
-                            resultat.getString("titre"),
-                            resultat.getString("description"),
-                            resultat.getString("statut"),
-                            lireDate(resultat, "echeance"),
-                            lireDate(resultat, "date_limite"),
-                            utilisateurId,
-                            resultat.getInt("projet_id")));
+                    taches.add(lireTache(resultat));
                 }
             }
             return taches;
         } catch (SQLException e) {
             throw new PersistanceException("Impossible de lire les tâches du projet.", e);
         }
+    }
+
+    public Tache trouverParId(int id) {
+        String sql = """
+                SELECT id, titre, description, statut, echeance, date_limite,
+                       utilisateur_id, projet_id
+                FROM tache
+                WHERE id = ?
+                """;
+
+        try (Connection connexion = DatabaseConnection.getConnection();
+             PreparedStatement instruction = connexion.prepareStatement(sql)) {
+            instruction.setInt(1, id);
+            try (ResultSet resultat = instruction.executeQuery()) {
+                return resultat.next() ? lireTache(resultat) : null;
+            }
+        } catch (SQLException e) {
+            throw new PersistanceException("Impossible de rechercher la tâche.", e);
+        }
+    }
+
+    public void assignerUtilisateur(int tacheId, Integer utilisateurId) {
+        String sql = "UPDATE tache SET utilisateur_id = ? WHERE id = ?";
+
+        try (Connection connexion = DatabaseConnection.getConnection();
+             PreparedStatement instruction = connexion.prepareStatement(sql)) {
+            if (utilisateurId == null) {
+                instruction.setNull(1, Types.INTEGER);
+            } else {
+                instruction.setInt(1, utilisateurId);
+            }
+            instruction.setInt(2, tacheId);
+            if (instruction.executeUpdate() == 0) {
+                throw new IllegalArgumentException("La tâche sélectionnée n'existe pas.");
+            }
+        } catch (SQLException e) {
+            throw new PersistanceException("Impossible d'assigner le membre à la tâche.", e);
+        }
+    }
+
+    private Tache lireTache(ResultSet resultat) throws SQLException {
+        int utilisateurIdLu = resultat.getInt("utilisateur_id");
+        Integer utilisateurId = resultat.wasNull() ? null : utilisateurIdLu;
+        return new Tache(
+                resultat.getInt("id"),
+                resultat.getString("titre"),
+                resultat.getString("description"),
+                resultat.getString("statut"),
+                lireDate(resultat, "echeance"),
+                lireDate(resultat, "date_limite"),
+                utilisateurId,
+                resultat.getInt("projet_id"));
     }
 
     private void setDate(PreparedStatement instruction, int index, LocalDate date)

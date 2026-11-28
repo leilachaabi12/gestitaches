@@ -3,8 +3,10 @@ package fr.usms.gestitaches.service;
 import fr.usms.gestitaches.dao.ProjetDAO;
 import fr.usms.gestitaches.dao.TacheDAO;
 import fr.usms.gestitaches.dao.DatabaseConnection;
+import fr.usms.gestitaches.dao.UtilisateurDAO;
 import fr.usms.gestitaches.model.Projet;
 import fr.usms.gestitaches.model.Tache;
+import fr.usms.gestitaches.model.Utilisateur;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,6 +15,9 @@ import org.junit.jupiter.api.Test;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.LocalDate;
 import java.util.List;
@@ -26,8 +31,11 @@ class TacheServiceTest {
     private static Path baseTemporaire;
     private ProjetDAO projetDAO;
     private TacheDAO tacheDAO;
+    private UtilisateurDAO utilisateurDAO;
     private TacheService service;
     private int projetId;
+    private int premierUtilisateurId;
+    private int secondUtilisateurId;
 
     @BeforeAll
     static void ouvrirBaseTemporaire() throws Exception {
@@ -58,9 +66,12 @@ class TacheServiceTest {
                     """);
         }
         tacheDAO = new TacheDAO();
-        service = new TacheService(tacheDAO, projetDAO);
+        utilisateurDAO = new UtilisateurDAO();
+        service = new TacheService(tacheDAO, projetDAO, utilisateurDAO);
         Projet projet = projetDAO.creer("Projet test");
         projetId = projet.getId();
+        premierUtilisateurId = creerUtilisateur("Alice");
+        secondUtilisateurId = creerUtilisateur("Bob");
     }
 
     @Test
@@ -116,6 +127,76 @@ class TacheServiceTest {
         assertThrows(IllegalArgumentException.class,
                 () -> service.creerTache(Integer.MAX_VALUE, "Tâche", null, null));
         assertEquals(0, service.listerParProjet(projetId).size());
+    }
+
+    @Test
+    void listerLesMembresDisponiblesPourLInterface() {
+        List<Utilisateur> utilisateurs = service.listerUtilisateurs();
+
+        assertEquals(List.of("Alice", "Bob"),
+                utilisateurs.stream().map(Utilisateur::getNom).toList());
+    }
+
+    @Test
+    void assignerUneTacheSansResponsableAUnMembreExistant() {
+        Tache tache = service.creerTache(projetId, "Tâche à assigner", null, null);
+
+        Tache assignee = service.assignerUtilisateur(tache.getId(), premierUtilisateurId);
+
+        assertEquals(premierUtilisateurId, assignee.getUtilisateurId());
+        assertEquals(premierUtilisateurId,
+                service.listerParProjet(projetId).getFirst().getUtilisateurId());
+    }
+
+    @Test
+    void remplacerLeResponsablePrecedentParLeSecondMembre() {
+        Tache tache = service.creerTache(projetId, "Tâche à réassigner", null, null);
+        service.assignerUtilisateur(tache.getId(), premierUtilisateurId);
+
+        Tache reassignee = service.assignerUtilisateur(tache.getId(), secondUtilisateurId);
+
+        assertEquals(secondUtilisateurId, reassignee.getUtilisateurId());
+        assertEquals(1, service.listerParProjet(projetId).size());
+    }
+
+    @Test
+    void refuserUnMembreInexistantSansChangerLeResponsableActuel() {
+        Tache tache = service.creerTache(projetId, "Tâche protégée", null, null);
+        service.assignerUtilisateur(tache.getId(), premierUtilisateurId);
+
+        assertThrows(IllegalArgumentException.class,
+                () -> service.assignerUtilisateur(tache.getId(), Integer.MAX_VALUE));
+
+        assertEquals(premierUtilisateurId,
+                service.listerParProjet(projetId).getFirst().getUtilisateurId());
+    }
+
+    @Test
+    void retirerLeResponsablePourLaisserLaTacheNonAssignee() {
+        Tache tache = service.creerTache(projetId, "Tâche sans responsable", null, null);
+        service.assignerUtilisateur(tache.getId(), premierUtilisateurId);
+
+        Tache nonAssignee = service.assignerUtilisateur(tache.getId(), null);
+
+        assertNull(nonAssignee.getUtilisateurId());
+        assertNull(service.listerParProjet(projetId).getFirst().getUtilisateurId());
+    }
+
+    private int creerUtilisateur(String nom) throws SQLException {
+        String sql = "INSERT INTO utilisateur (nom, email) VALUES (?, ?)";
+        try (Connection connexion = DatabaseConnection.getConnection();
+             PreparedStatement instruction =
+                     connexion.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            instruction.setString(1, nom);
+            instruction.setString(2, nom.toLowerCase() + "@example.test");
+            instruction.executeUpdate();
+            try (ResultSet clefs = instruction.getGeneratedKeys()) {
+                if (!clefs.next()) {
+                    throw new SQLException("Aucun identifiant de test généré.");
+                }
+                return clefs.getInt(1);
+            }
+        }
     }
 
     private List<String> titresDesTaches() {
