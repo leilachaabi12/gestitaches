@@ -139,6 +139,20 @@ public class TacheDAO {
         }
     }
 
+    public boolean changerStatut(int tacheId, String statutActuel, String nouveauStatut) {
+        String sql = "UPDATE tache SET statut = ? WHERE id = ? AND statut = ?";
+
+        try (Connection connexion = DatabaseConnection.getConnection();
+             PreparedStatement instruction = connexion.prepareStatement(sql)) {
+            instruction.setString(1, nouveauStatut);
+            instruction.setInt(2, tacheId);
+            instruction.setString(3, statutActuel);
+            return instruction.executeUpdate() == 1;
+        } catch (SQLException e) {
+            throw new PersistanceException("Impossible de changer le statut de la tâche.", e);
+        }
+    }
+
     private Tache lireTache(ResultSet resultat) throws SQLException {
         int utilisateurIdLu = resultat.getInt("utilisateur_id");
         Integer utilisateurId = resultat.wasNull() ? null : utilisateurIdLu;

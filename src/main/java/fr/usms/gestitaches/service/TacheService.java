@@ -13,6 +13,8 @@ import java.util.List;
 public class TacheService {
 
     private static final String STATUT_INITIAL = "à faire";
+    private static final String STATUT_EN_COURS = "en cours";
+    private static final String STATUT_TERMINE = "terminé";
 
     private final TacheDAO tacheDAO;
     private final ProjetDAO projetDAO;
@@ -75,6 +77,36 @@ public class TacheService {
             throw new IllegalArgumentException("Le membre sélectionné n'existe pas.");
         }
         tacheDAO.assignerUtilisateur(tacheId, utilisateurId);
+        return tacheDAO.trouverParId(tacheId);
+    }
+
+    public Tache changerStatut(int tacheId, String nouveauStatut) {
+        Tache tache = tacheDAO.trouverParId(tacheId);
+        if (tache == null) {
+            throw new IllegalArgumentException("La tâche sélectionnée n'existe pas.");
+        }
+        if (!STATUT_INITIAL.equals(nouveauStatut)
+                && !STATUT_EN_COURS.equals(nouveauStatut)
+                && !STATUT_TERMINE.equals(nouveauStatut)) {
+            throw new IllegalArgumentException("Le statut demandé n'est pas autorisé.");
+        }
+        if (STATUT_TERMINE.equals(tache.getStatut())) {
+            throw new IllegalArgumentException("Le statut d'une tâche terminée est figé.");
+        }
+
+        boolean transitionAutorisee =
+                STATUT_INITIAL.equals(tache.getStatut())
+                        && (STATUT_EN_COURS.equals(nouveauStatut)
+                        || STATUT_TERMINE.equals(nouveauStatut))
+                || STATUT_EN_COURS.equals(tache.getStatut())
+                        && STATUT_TERMINE.equals(nouveauStatut);
+        if (!transitionAutorisee) {
+            throw new IllegalArgumentException("Cette transition de statut n'est pas autorisée.");
+        }
+        if (!tacheDAO.changerStatut(tacheId, tache.getStatut(), nouveauStatut)) {
+            throw new IllegalArgumentException(
+                    "Le statut de la tâche a changé; rechargez-la avant de réessayer.");
+        }
         return tacheDAO.trouverParId(tacheId);
     }
 }

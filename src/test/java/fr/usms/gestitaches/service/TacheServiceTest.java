@@ -182,6 +182,72 @@ class TacheServiceTest {
         assertNull(service.listerParProjet(projetId).getFirst().getUtilisateurId());
     }
 
+    @Test
+    void passerDeAFaireAEnCours() {
+        Tache tache = service.creerTache(projetId, "Tâche", null, null);
+
+        Tache modifiee = service.changerStatut(tache.getId(), "en cours");
+
+        assertEquals("en cours", modifiee.getStatut());
+    }
+
+    @Test
+    void passerDeAFaireATermine() {
+        Tache tache = service.creerTache(projetId, "Tâche", null, null);
+
+        Tache modifiee = service.changerStatut(tache.getId(), "terminé");
+
+        assertEquals("terminé", modifiee.getStatut());
+    }
+
+    @Test
+    void passerDeEnCoursATermine() {
+        Tache tache = service.creerTache(projetId, "Tâche", null, null);
+        service.changerStatut(tache.getId(), "en cours");
+
+        Tache modifiee = service.changerStatut(tache.getId(), "terminé");
+
+        assertEquals("terminé", modifiee.getStatut());
+    }
+
+    @Test
+    void refuserRetourDeEnCoursAVFaireSansChangerLeStatut() {
+        Tache tache = service.creerTache(projetId, "Tâche", null, null);
+        service.changerStatut(tache.getId(), "en cours");
+
+        assertThrows(IllegalArgumentException.class,
+                () -> service.changerStatut(tache.getId(), "à faire"));
+
+        assertEquals("en cours", tacheDAO.trouverParId(tache.getId()).getStatut());
+    }
+
+    @Test
+    void refuserUnStatutNonAutoriseSansChangerLeStatut() {
+        Tache tache = service.creerTache(projetId, "Tâche", null, null);
+
+        assertThrows(IllegalArgumentException.class,
+                () -> service.changerStatut(tache.getId(), "bloquée"));
+
+        assertEquals("à faire", tacheDAO.trouverParId(tache.getId()).getStatut());
+    }
+
+    @Test
+    void figerLeStatutUneFoisTermine() {
+        Tache tache = service.creerTache(projetId, "Tâche", null, null);
+        service.changerStatut(tache.getId(), "terminé");
+
+        assertThrows(IllegalArgumentException.class,
+                () -> service.changerStatut(tache.getId(), "en cours"));
+
+        assertEquals("terminé", tacheDAO.trouverParId(tache.getId()).getStatut());
+    }
+
+    @Test
+    void refuserLeChangementDuStatutDUneTacheInexistante() {
+        assertThrows(IllegalArgumentException.class,
+                () -> service.changerStatut(Integer.MAX_VALUE, "en cours"));
+    }
+
     private int creerUtilisateur(String nom) throws SQLException {
         String sql = "INSERT INTO utilisateur (nom, email) VALUES (?, ?)";
         try (Connection connexion = DatabaseConnection.getConnection();

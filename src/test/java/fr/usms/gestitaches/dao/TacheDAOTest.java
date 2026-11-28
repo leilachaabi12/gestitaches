@@ -14,8 +14,10 @@ import java.time.LocalDate;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class TacheDAOTest {
 
@@ -95,5 +97,32 @@ class TacheDAOTest {
         assertEquals(2, taches.size());
         assertEquals(premiere.getId(), taches.getFirst().getId());
         assertEquals("Première tâche", taches.getFirst().getTitre());
+    }
+
+    @Test
+    void changerLeStatutSansModifierLesAutresChamps() {
+        Tache creee = tacheDAO.creer(new Tache(null, "Maquette", "Description",
+                "à faire", null, null, null, projetId));
+
+        boolean modifiee = tacheDAO.changerStatut(creee.getId(), "à faire", "en cours");
+        Tache relue = tacheDAO.trouverParId(creee.getId());
+
+        assertTrue(modifiee);
+        assertEquals("en cours", relue.getStatut());
+        assertEquals("Maquette", relue.getTitre());
+        assertEquals("Description", relue.getDescription());
+        assertEquals(projetId, relue.getProjetId());
+    }
+
+    @Test
+    void refuserLaMiseAJourSiLeStatutCourantEstDevenuObsolete() {
+        Tache creee = tacheDAO.creer(new Tache(null, "Maquette", null,
+                "à faire", null, null, null, projetId));
+        tacheDAO.changerStatut(creee.getId(), "à faire", "en cours");
+
+        boolean modifiee = tacheDAO.changerStatut(creee.getId(), "à faire", "terminé");
+
+        assertFalse(modifiee);
+        assertEquals("en cours", tacheDAO.trouverParId(creee.getId()).getStatut());
     }
 }

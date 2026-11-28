@@ -39,6 +39,9 @@ public class TachePanel extends JPanel {
             new DefaultComboBoxModel<>();
     private final JComboBox<Utilisateur> listeUtilisateurs =
             new JComboBox<>(utilisateursModel);
+    private final DefaultComboBoxModel<String> statutsModel = new DefaultComboBoxModel<>();
+    private final JComboBox<String> listeStatuts = new JComboBox<>(statutsModel);
+    private final JButton changerStatut = new JButton("Changer le statut");
     private final JTextField champTitre = new JTextField(20);
     private final JTextField champDescription = new JTextField(20);
     private final JTextField champEcheance = new JTextField(10);
@@ -81,8 +84,14 @@ public class TachePanel extends JPanel {
         affectation.add(listeUtilisateurs);
         affectation.add(assigner);
 
-        JPanel actions = new JPanel(new GridLayout(2, 1));
+        JPanel ligneStatut = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        ligneStatut.add(new JLabel("Nouveau statut :"));
+        ligneStatut.add(listeStatuts);
+        ligneStatut.add(changerStatut);
+
+        JPanel actions = new JPanel(new GridLayout(3, 1));
         actions.add(affectation);
+        actions.add(ligneStatut);
         actions.add(formulaireCreation);
 
         add(titreProjet, BorderLayout.NORTH);
@@ -91,9 +100,11 @@ public class TachePanel extends JPanel {
 
         creer.addActionListener(event -> creerTache());
         assigner.addActionListener(event -> assignerUtilisateur());
+        changerStatut.addActionListener(event -> changerStatut());
         listeTaches.addListSelectionListener(event -> {
             if (!event.getValueIsAdjusting()) {
                 afficherResponsableSelectionne();
+                afficherTransitionsDisponibles();
             }
         });
     }
@@ -155,6 +166,25 @@ public class TachePanel extends JPanel {
         }
     }
 
+    private void changerStatut() {
+        Tache tache = listeTaches.getSelectedValue();
+        String nouveauStatut = (String) listeStatuts.getSelectedItem();
+        if (tache == null || nouveauStatut == null) {
+            afficherErreur("Selectionnez une tâche et un statut autorisé.",
+                    "Changement refusé");
+            return;
+        }
+
+        try {
+            tacheService.changerStatut(tache.getId(), nouveauStatut);
+            rafraichirTaches(tache.getId());
+        } catch (IllegalArgumentException e) {
+            afficherErreur(e.getMessage(), "Changement refusé");
+        } catch (PersistanceException e) {
+            afficherErreur(e.getMessage(), "Erreur de persistance");
+        }
+    }
+
     private void chargerUtilisateurs() {
         try {
             List<Utilisateur> utilisateurs = tacheService.listerUtilisateurs();
@@ -210,6 +240,22 @@ public class TachePanel extends JPanel {
         if (utilisateurId != null) {
             utilisateursModel.setSelectedItem(null);
         }
+    }
+
+    private void afficherTransitionsDisponibles() {
+        Tache tache = listeTaches.getSelectedValue();
+        statutsModel.removeAllElements();
+        changerStatut.setEnabled(false);
+        if (tache == null || "terminé".equals(tache.getStatut())) {
+            return;
+        }
+        if ("à faire".equals(tache.getStatut())) {
+            statutsModel.addElement("en cours");
+            statutsModel.addElement("terminé");
+        } else if ("en cours".equals(tache.getStatut())) {
+            statutsModel.addElement("terminé");
+        }
+        changerStatut.setEnabled(statutsModel.getSize() > 0);
     }
 
     private ListCellRenderer<Utilisateur> creerRenduUtilisateur() {
