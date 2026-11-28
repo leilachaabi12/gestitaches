@@ -14,6 +14,9 @@ Critères d'acceptation :
 - Étant donné que j'ai créé un projet
   Quand je consulte sa fiche
   Alors son nom est affiché tel que je l'ai saisi
+- Étant donné qu'un projet 
+  Quand je crée un projet avec le nom « Site web »
+  Alors on peux ajouter une courte description mais pas obligatoires
 
 Cas limite : creation dun projet avec un nom deja existant, la création est refusée avec un message indiquant que ce projet existe deja
 
