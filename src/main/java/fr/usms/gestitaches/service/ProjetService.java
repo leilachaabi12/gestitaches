@@ -18,12 +18,13 @@ public class ProjetService {
         if (nom == null || nom.trim().isEmpty()) {
             throw new IllegalArgumentException("Le nom du projet est obligatoire.");
         }
-        if (projetDAO.existeParNom(nom)) {
+        String nomNormalise = nom.trim();
+        if (projetDAO.existeParNom(nomNormalise)) {
             throw new IllegalArgumentException("Ce projet existe deja.");
         }
 
         try {
-            return projetDAO.creer(nom);
+            return projetDAO.creer(nomNormalise);
         } catch (PersistanceException e) {
             throw e;
         }

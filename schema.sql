@@ -6,7 +6,7 @@ CREATE TABLE utilisateur (
 
 CREATE TABLE projet (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
-  nom TEXT,
+  nom TEXT NOT NULL UNIQUE,
   description TEXT
 );
 

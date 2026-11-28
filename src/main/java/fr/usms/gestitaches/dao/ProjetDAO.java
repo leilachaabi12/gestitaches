@@ -20,7 +20,7 @@ public class ProjetDAO {
         String sql = """
                 CREATE TABLE IF NOT EXISTS projet (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    nom TEXT NOT NULL,
+                    nom TEXT NOT NULL UNIQUE,
                     description TEXT
                 )
                 """;

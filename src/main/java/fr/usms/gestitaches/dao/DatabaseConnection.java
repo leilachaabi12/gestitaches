@@ -11,13 +11,15 @@ import java.sql.Statement;
  */
 public final class DatabaseConnection {
 
-    private static final String URL = "jdbc:sqlite:gestitaches.db";
+    private static final String URL_SYSTEM_PROPERTY = "gestitaches.db.url";
+    private static final String DEFAULT_URL = "jdbc:sqlite:gestitaches.db";
 
     private DatabaseConnection() {
     }
 
     public static Connection getConnection() throws SQLException {
-        Connection connexion = DriverManager.getConnection(URL);
+        String url = System.getProperty(URL_SYSTEM_PROPERTY, DEFAULT_URL);
+        Connection connexion = DriverManager.getConnection(url);
         // SQLite ne verifie les cles etrangeres que si on le lui demande, a chaque connexion.
         try (Statement instruction = connexion.createStatement()) {
             instruction.execute("PRAGMA foreign_keys = ON");
