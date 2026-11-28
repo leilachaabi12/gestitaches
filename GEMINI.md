@@ -28,14 +28,20 @@ Application de bureau de gestion de tâches pour une petite équipe : un chef de
 - Statuts autorisés : à faire (défaut), en cours, terminé, vérifiés avant écriture en base
 - Connexions et fichiers ouverts dans un try-with-resources
 - Chaque critère d'acceptation et chaque cas limite de spec.md a au moins un test
+- Ressources JDBC ouvertes dans un try-with-resources.
+- Une SQLException est traduite en PersistanceException,
+  jamais avalée (ni catch vide, ni printStackTrace seul).
 
 ## Façon de travailler
 
 Présenter un plan et attendre mon accord avant toute modification de fichier
 Traiter une seule user story à la fois, dans l'ordre de spec.md, avec un commit par story
 Lancer mvn clean test avant de déclarer une story terminée
+Ne modifier que les fichiers listés dans ma demande.
+Si un autre fichier est nécessaire, s'arrêter et demander.
 
 ## Documents de référence
 
 - `spec.md` : user stories et critères d'acceptation
 - `schema.sql` : schéma de la base de données
+- architecture.md : couches et dépendances autorisées

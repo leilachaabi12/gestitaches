@@ -1,8 +1,5 @@
 # Architecture de GestiTaches
 
-> Modèle à compléter dans le TP2, Partie A, puis à enregistrer sous le nom
-> `architecture.md`, à la racine du projet. Supprimez ces lignes ensuite.
-
 ## Couches : ui -> service -> dao -> base
 
 - ui      : Swing uniquement. Ni SQL, ni règle métier.
@@ -28,9 +25,8 @@ Dépendances interdites : ui -> dao, dao -> service, service -> ui.
 - SQLException traduite en PersistanceException, jamais avalée.
 
 ## Règles métier, par user story
-
-- US1 : <règle> -> <couche et classe>
-- US2 : <règle> -> <couche et classe>
-- US3 : <règle> -> <couche et classe>
-- US4 : <règle> -> <couche et classe>
-- US5 : <règle> -> <couche et classe>
+- US1 : le nom du projet est obligatoire -> ProjetService
+- US2 : titre obligatoire, projet existant, statut initial "À faire" -> TacheService
+- US3 : le membre assigné doit exister -> TacheService
+- US4 : transitions de statut autorisées uniquement -> TacheService
+- US5 : filtre par statut ou membre en SQL -> TacheDao
